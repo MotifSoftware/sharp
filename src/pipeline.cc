@@ -819,32 +819,6 @@ public:
       {
         // Convert colourspace, pass the current known interpretation so libvips doesn't have to guess
         image = image.colourspace(baton->colourspace, VImage::option()->set("source_space", image.interpretation()));
-        // Transform colours from embedded profile to output profile
-        if (baton->withMetadata && sharp::HasProfile(image))
-        {
-          image = image.icc_transform(vips_enum_nick(VIPS_TYPE_INTERPRETATION, baton->colourspace),
-                                      VImage::option()->set("embedded", TRUE));
-        }
-      }
-
-      // Set ICC profile
-      if (!baton->withMetadataIcc.empty())
-      {
-        VipsBlob *blob = NULL;
-        if (vips_profile_load(const_cast<char *>(baton->withMetadataIcc.data()), &blob, NULL) == 0)
-        {
-          vips_image_set_blob(
-              image.get_image(),
-              "icc-profile-data",
-              blob->area.free_fn,
-              blob->area.data,
-              blob->area.length);
-        }
-
-        /*image = image.icc_import(
-            VImage::option()
-                ->set("input_profile", const_cast<char *>(baton->withMetadataIcc.data()))
-                ->set("intent", VIPS_INTENT_PERCEPTUAL));*/
       }
 
       // Override EXIF Orientation tag
