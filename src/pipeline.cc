@@ -124,15 +124,10 @@ public:
           vips_image_set_blob(
               image.get_image(),
               "icc-profile-data",
-              blob->area.free_fn,
+              nullptr,
               blob->area.data,
               blob->area.length);
         }
-
-        /*image = image.icc_import(
-            VImage::option()
-                ->set("input_profile", const_cast<char *>(baton->withMetadataIcc.data()))
-                ->set("intent", VIPS_INTENT_PERCEPTUAL));*/
       }
 
       // Get pre-resize image width and height
@@ -376,10 +371,10 @@ public:
         // Convert to sRGB using embedded profile
         try
         {
-          /*image = image.icc_transform("srgb", VImage::option()
+          image = image.icc_transform("srgb", VImage::option()
                                                   ->set("embedded", TRUE)
                                                   ->set("depth", image.interpretation() == VIPS_INTERPRETATION_RGB16 ? 16 : 8)
-                                                  ->set("intent", VIPS_INTENT_PERCEPTUAL));*/
+                                                  ->set("intent", VIPS_INTENT_PERCEPTUAL));
         }
         catch (...)
         {
@@ -388,9 +383,23 @@ public:
       }
       else if (image.interpretation() == VIPS_INTERPRETATION_CMYK)
       {
-        /*image = image.icc_transform("srgb", VImage::option()
+        image = image.icc_transform("srgb", VImage::option()
                                                 ->set("input_profile", "srgb")
-                                                ->set("intent", VIPS_INTENT_PERCEPTUAL));*/
+                                                ->set("intent", VIPS_INTENT_PERCEPTUAL));
+      }
+
+      if (!baton->withMetadataIcc.empty())
+      {
+        VipsBlob *blob = NULL;
+        if (vips_profile_load(const_cast<char *>(baton->withMetadataIcc.data()), &blob, NULL) == 0)
+        {
+          vips_image_set_blob(
+              image.get_image(),
+              "icc-profile-data",
+              blob->area.free_fn,
+              blob->area.data,
+              blob->area.length);
+        }
       }
 
       // Flatten image to remove alpha channel
