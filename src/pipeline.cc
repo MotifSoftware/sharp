@@ -116,6 +116,25 @@ public:
         image = image.extract_area(baton->leftOffsetPre, baton->topOffsetPre, baton->widthPre, baton->heightPre);
       }
 
+      if (!baton->withMetadataIcc.empty())
+      {
+        VipsBlob *blob = NULL;
+        if (vips_profile_load(const_cast<char *>(baton->withMetadataIcc.data()), &blob, NULL) == 0)
+        {
+          vips_image_set_blob(
+              image.get_image(),
+              "icc-profile-data",
+              blob->area.free_fn,
+              blob->area.data,
+              blob->area.length);
+        }
+
+        /*image = image.icc_import(
+            VImage::option()
+                ->set("input_profile", const_cast<char *>(baton->withMetadataIcc.data()))
+                ->set("intent", VIPS_INTENT_PERCEPTUAL));*/
+      }
+
       // Get pre-resize image width and height
       int inputWidth = image.width();
       int inputHeight = image.height();
@@ -808,13 +827,24 @@ public:
         }
       }
 
-      // Apply output ICC profile
+      // Set ICC profile
       if (!baton->withMetadataIcc.empty())
       {
-        image = image.icc_import(
+        VipsBlob *blob = NULL;
+        if (vips_profile_load(const_cast<char *>(baton->withMetadataIcc.data()), &blob, NULL) == 0)
+        {
+          vips_image_set_blob(
+              image.get_image(),
+              "icc-profile-data",
+              blob->area.free_fn,
+              blob->area.data,
+              blob->area.length);
+        }
+
+        /*image = image.icc_import(
             VImage::option()
                 ->set("input_profile", const_cast<char *>(baton->withMetadataIcc.data()))
-                ->set("intent", VIPS_INTENT_PERCEPTUAL));
+                ->set("intent", VIPS_INTENT_PERCEPTUAL));*/
       }
 
       // Override EXIF Orientation tag
