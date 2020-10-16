@@ -122,7 +122,7 @@ public:
       {
         if (iccProfileBlob == NULL)
         {
-          vips_profile_load(const_cast<char *>(baton->withMetadataIcc.data()), &iccProfileBlob, NULL)
+          vips_profile_load(const_cast<char *>(baton->withMetadataIcc.data()), &iccProfileBlob, NULL);
         }
 
         if (iccProfileBlob != NULL)
@@ -398,7 +398,7 @@ public:
       {
         if (iccProfileBlob == NULL)
         {
-          vips_profile_load(const_cast<char *>(baton->withMetadataIcc.data()), &iccProfileBlob, NULL)
+          vips_profile_load(const_cast<char *>(baton->withMetadataIcc.data()), &iccProfileBlob, NULL);
         }
 
         if (iccProfileBlob != NULL)
