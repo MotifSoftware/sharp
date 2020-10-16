@@ -125,7 +125,16 @@ public:
           vips_profile_load(const_cast<char *>(baton->withMetadataIcc.data()), &iccProfileBlob, NULL);
         }
 
-        if (iccProfileBlob != NULL)
+        void *currentIccProfileBlob = NULL;
+
+        size_t length;
+        int result = vips_image_get_blob(
+            image.get_image(),
+            "icc-profile-data",
+            const_cast<const void **>(&currentIccProfileBlob),
+            &length);
+
+        if (iccProfileBlob != NULL && (result == -1 || length > 0))
         {
           vips_image_set_blob(
               image.get_image(),
@@ -392,24 +401,6 @@ public:
         image = image.icc_transform("srgb", VImage::option()
                                                 ->set("input_profile", "srgb")
                                                 ->set("intent", VIPS_INTENT_PERCEPTUAL));
-      }
-
-      if (!baton->withMetadataIcc.empty())
-      {
-        if (iccProfileBlob == NULL)
-        {
-          vips_profile_load(const_cast<char *>(baton->withMetadataIcc.data()), &iccProfileBlob, NULL);
-        }
-
-        if (iccProfileBlob != NULL)
-        {
-          vips_image_set_blob(
-              image.get_image(),
-              "icc-profile-data",
-              nullptr,
-              iccProfileBlob->area.data,
-              iccProfileBlob->area.length);
-        }
       }
 
       // Flatten image to remove alpha channel
@@ -843,21 +834,20 @@ public:
       // Set ICC profile
       if (!baton->withMetadataIcc.empty())
       {
-        VipsBlob *blob = NULL;
-        if (vips_profile_load(const_cast<char *>(baton->withMetadataIcc.data()), &blob, NULL) == 0)
+        if (iccProfileBlob == NULL)
+        {
+          vips_profile_load(const_cast<char *>(baton->withMetadataIcc.data()), &iccProfileBlob, NULL);
+        }
+
+        if (iccProfileBlob != NULL)
         {
           vips_image_set_blob(
               image.get_image(),
               "icc-profile-data",
-              blob->area.free_fn,
-              blob->area.data,
-              blob->area.length);
+              nullptr,
+              iccProfileBlob->area.data,
+              iccProfileBlob->area.length);
         }
-
-        /*image = image.icc_import(
-            VImage::option()
-                ->set("input_profile", const_cast<char *>(baton->withMetadataIcc.data()))
-                ->set("intent", VIPS_INTENT_PERCEPTUAL));*/
       }
 
       // Override EXIF Orientation tag
