@@ -45,6 +45,8 @@
 #define STAT64_FUNCTION stat64
 #endif
 
+VipsBlob *iccProfileBlob{NULL};
+
 class PipelineWorker : public Napi::AsyncWorker
 {
 public:
@@ -118,15 +120,19 @@ public:
 
       if (!baton->withMetadataIcc.empty())
       {
-        VipsBlob *blob = NULL;
-        if (vips_profile_load(const_cast<char *>(baton->withMetadataIcc.data()), &blob, NULL) == 0)
+        if (iccProfileBlob == NULL)
+        {
+          vips_profile_load(const_cast<char *>(baton->withMetadataIcc.data()), &iccProfileBlob, NULL)
+        }
+
+        if (iccProfileBlob != NULL)
         {
           vips_image_set_blob(
               image.get_image(),
               "icc-profile-data",
               nullptr,
-              blob->area.data,
-              blob->area.length);
+              iccProfileBlob->area.data,
+              iccProfileBlob->area.length);
         }
       }
 
@@ -390,15 +396,19 @@ public:
 
       if (!baton->withMetadataIcc.empty())
       {
-        VipsBlob *blob = NULL;
-        if (vips_profile_load(const_cast<char *>(baton->withMetadataIcc.data()), &blob, NULL) == 0)
+        if (iccProfileBlob == NULL)
+        {
+          vips_profile_load(const_cast<char *>(baton->withMetadataIcc.data()), &iccProfileBlob, NULL)
+        }
+
+        if (iccProfileBlob != NULL)
         {
           vips_image_set_blob(
               image.get_image(),
               "icc-profile-data",
-              blob->area.free_fn,
-              blob->area.data,
-              blob->area.length);
+              nullptr,
+              iccProfileBlob->area.data,
+              iccProfileBlob->area.length);
         }
       }
 
