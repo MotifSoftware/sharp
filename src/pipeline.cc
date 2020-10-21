@@ -118,7 +118,7 @@ public:
         image = image.extract_area(baton->leftOffsetPre, baton->topOffsetPre, baton->widthPre, baton->heightPre);
       }
 
-      if (!baton->withMetadataIcc.empty())
+      /* if (!baton->withMetadataIcc.empty())
       {
         if (iccProfileBlob == NULL)
         {
@@ -143,7 +143,7 @@ public:
               iccProfileBlob->area.data,
               iccProfileBlob->area.length);
         }
-      }
+      } */
 
       // Get pre-resize image width and height
       int inputWidth = image.width();
@@ -386,10 +386,10 @@ public:
         // Convert to sRGB using embedded profile
         try
         {
-          /* image = image.icc_transform("srgb", VImage::option()
+          image = image.icc_transform("srgb", VImage::option()
                                                   ->set("embedded", TRUE)
                                                   ->set("depth", image.interpretation() == VIPS_INTERPRETATION_RGB16 ? 16 : 8)
-                                                  ->set("intent", VIPS_INTENT_PERCEPTUAL)); */
+                                                  ->set("intent", VIPS_INTENT_PERCEPTUAL));
         }
         catch (...)
         {
@@ -398,9 +398,9 @@ public:
       }
       else if (image.interpretation() == VIPS_INTERPRETATION_CMYK)
       {
-        /* image = image.icc_transform("srgb", VImage::option()
+        image = image.icc_transform("srgb", VImage::option()
                                                 ->set("input_profile", "srgb")
-                                                ->set("intent", VIPS_INTENT_PERCEPTUAL)); */
+                                                ->set("intent", VIPS_INTENT_PERCEPTUAL));
       }
 
       // Flatten image to remove alpha channel
