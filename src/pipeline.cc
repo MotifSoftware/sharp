@@ -386,10 +386,10 @@ public:
         // Convert to sRGB using embedded profile
         try
         {
-          image = image.icc_transform("srgb", VImage::option()
+          /* image = image.icc_transform("srgb", VImage::option()
                                                   ->set("embedded", TRUE)
                                                   ->set("depth", image.interpretation() == VIPS_INTERPRETATION_RGB16 ? 16 : 8)
-                                                  ->set("intent", VIPS_INTENT_PERCEPTUAL));
+                                                  ->set("intent", VIPS_INTENT_PERCEPTUAL)); */
         }
         catch (...)
         {
@@ -398,9 +398,9 @@ public:
       }
       else if (image.interpretation() == VIPS_INTERPRETATION_CMYK)
       {
-        image = image.icc_transform("srgb", VImage::option()
+        /* image = image.icc_transform("srgb", VImage::option()
                                                 ->set("input_profile", "srgb")
-                                                ->set("intent", VIPS_INTENT_PERCEPTUAL));
+                                                ->set("intent", VIPS_INTENT_PERCEPTUAL)); */
       }
 
       // Flatten image to remove alpha channel
