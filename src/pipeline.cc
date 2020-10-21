@@ -118,32 +118,15 @@ public:
         image = image.extract_area(baton->leftOffsetPre, baton->topOffsetPre, baton->widthPre, baton->heightPre);
       }
 
-      /* if (!baton->withMetadataIcc.empty())
+      if (!baton->withMetadataIcc.empty())
       {
-        if (iccProfileBlob == NULL)
-        {
-          vips_profile_load(const_cast<char *>(baton->withMetadataIcc.data()), &iccProfileBlob, NULL);
-        }
-
-        void *currentIccProfileBlob = NULL;
-
-        size_t length;
-        int result = vips_image_get_blob(
+        vips_image_set_blob(
             image.get_image(),
             "icc-profile-data",
-            const_cast<const void **>(&currentIccProfileBlob),
-            &length);
-
-        if (iccProfileBlob != NULL && (result == -1 || length > 0))
-        {
-          vips_image_set_blob(
-              image.get_image(),
-              "icc-profile-data",
-              nullptr,
-              iccProfileBlob->area.data,
-              iccProfileBlob->area.length);
-        }
-      } */
+            nullptr,
+            nullptr,
+            0);
+      }
 
       // Get pre-resize image width and height
       int inputWidth = image.width();
