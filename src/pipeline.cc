@@ -118,7 +118,7 @@ public:
         image = image.extract_area(baton->leftOffsetPre, baton->topOffsetPre, baton->widthPre, baton->heightPre);
       }
 
-      /* if (!baton->withMetadataIcc.empty())
+      if (baton->iccTransform && !baton->withMetadataIcc.empty())
       {
         if (iccProfileBlob == NULL)
         {
@@ -143,7 +143,7 @@ public:
               iccProfileBlob->area.data,
               iccProfileBlob->area.length);
         }
-      } */
+      }
 
       // Get pre-resize image width and height
       int inputWidth = image.width();
@@ -832,7 +832,7 @@ public:
       }
 
       // Set ICC profile
-      if (!baton->withMetadataIcc.empty())
+      if (!baton->iccTransform && !baton->withMetadataIcc.empty())
       {
         if (iccProfileBlob == NULL)
         {
