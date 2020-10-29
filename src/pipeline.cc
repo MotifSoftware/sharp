@@ -832,7 +832,7 @@ public:
       }
 
       // Set ICC profile
-      if (!baton->iccTransform && !baton->withMetadataIcc.empty())
+      if (!baton->withMetadataIcc.empty())
       {
         if (iccProfileBlob == NULL)
         {
