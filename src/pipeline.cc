@@ -379,12 +379,12 @@ public:
 
       // Ensure we're using a device-independent colour space
       if (
-          sharp::HasProfile(image) &&
+          baton->iccTransform == true && sharp::HasProfile(image) &&
           image.interpretation() != VIPS_INTERPRETATION_LABS &&
           image.interpretation() != VIPS_INTERPRETATION_GREY16)
       {
         // Convert to sRGB using embedded profile
-        /*try
+        try
         {
           image = image.icc_transform("srgb", VImage::option()
                                                   ->set("embedded", TRUE)
@@ -394,7 +394,7 @@ public:
         catch (...)
         {
           // Ignore failure of embedded profile
-        }*/
+        }
       }
       else if (image.interpretation() == VIPS_INTERPRETATION_CMYK)
       {
@@ -1606,6 +1606,7 @@ Napi::Value pipeline(const Napi::CallbackInfo &info)
   baton->withMetadata = sharp::AttrAsBool(options, "withMetadata");
   baton->withMetadataOrientation = sharp::AttrAsUint32(options, "withMetadataOrientation");
   baton->withMetadataIcc = sharp::AttrAsStr(options, "withMetadataIcc");
+  baton->iccTransform = sharp::AttrAsBool(options, "iccTransform");
   // Format-specific
   baton->jpegQuality = sharp::AttrAsUint32(options, "jpegQuality");
   baton->jpegProgressive = sharp::AttrAsBool(options, "jpegProgressive");
