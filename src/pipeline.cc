@@ -118,23 +118,23 @@ public:
         image = image.extract_area(baton->leftOffsetPre, baton->topOffsetPre, baton->widthPre, baton->heightPre);
       }
 
-      if (baton->iccTransform && !baton->withMetadataIcc.empty())
+      if (!baton->withMetadataIcc.empty())
       {
         if (iccProfileBlob == NULL)
         {
           vips_profile_load(const_cast<char *>(baton->withMetadataIcc.data()), &iccProfileBlob, NULL);
         }
 
-        void *currentIccProfileBlob = NULL;
+        /*void *currentIccProfileBlob = NULL;
 
         size_t length;
         int result = vips_image_get_blob(
             image.get_image(),
             "icc-profile-data",
             const_cast<const void **>(&currentIccProfileBlob),
-            &length);
+            &length);*/
 
-        if (iccProfileBlob != NULL && (result == -1 || length > 0))
+        if (iccProfileBlob != NULL)
         {
           vips_image_set_blob(
               image.get_image(),
@@ -390,17 +390,46 @@ public:
                                                   ->set("embedded", TRUE)
                                                   ->set("depth", image.interpretation() == VIPS_INTERPRETATION_RGB16 ? 16 : 8)
                                                   ->set("intent", VIPS_INTENT_PERCEPTUAL));
+          vips_image_set_blob(
+              image.get_image(),
+              "icc-profile-data",
+              nullptr,
+              nullptr,
+              0);
         }
         catch (...)
         {
           // Ignore failure of embedded profile
         }
       }
-      else if (image.interpretation() == VIPS_INTERPRETATION_CMYK)
+      else
       {
-        /* image = image.icc_transform("srgb", VImage::option()
-                                                ->set("input_profile", "srgb")
-                                                ->set("intent", VIPS_INTENT_PERCEPTUAL)); */
+        if (!baton->withMetadataIcc.empty())
+        {
+          if (iccProfileBlob == NULL)
+          {
+            vips_profile_load(const_cast<char *>(baton->withMetadataIcc.data()), &iccProfileBlob, NULL);
+          }
+
+          /* void *currentIccProfileBlob = NULL;
+
+          size_t length;
+          int result = vips_image_get_blob(
+              image.get_image(),
+              "icc-profile-data",
+              const_cast<const void **>(&currentIccProfileBlob),
+              &length); */
+
+          if (iccProfileBlob != NULL)
+          {
+            vips_image_set_blob(
+                image.get_image(),
+                "icc-profile-data",
+                nullptr,
+                iccProfileBlob->area.data,
+                iccProfileBlob->area.length);
+          }
+        }
       }
 
       // Flatten image to remove alpha channel
